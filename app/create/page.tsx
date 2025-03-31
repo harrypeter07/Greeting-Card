@@ -1,11 +1,4 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-	title: "Create Card",
-	description: "Create a beautiful greeting card using AI assistance",
-};
-
-("use client");
+"use client";
 
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
