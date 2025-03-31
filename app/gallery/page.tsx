@@ -21,8 +21,9 @@ interface CardData {
 }
 
 export const metadata: Metadata = {
-	title: "Your Eid Cards Gallery",
-	description: "View and manage your saved Eid greeting cards",
+	title: "Gallery",
+	description:
+		"Browse beautiful AI-generated greeting cards created by our community",
 };
 
 export default function GalleryPage() {
