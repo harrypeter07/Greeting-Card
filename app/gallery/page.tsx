@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/card";
+import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
