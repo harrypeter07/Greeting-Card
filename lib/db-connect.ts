@@ -1,64 +1,43 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = process.env.DB_NAME;
+const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL;
 
 if (!MONGODB_URI) {
 	throw new Error(
-		"Please define the MONGODB_URI environment variable inside .env"
+		"Please define the MONGODB_URI or DATABASE_URL environment variable inside .env"
 	);
 }
 
-if (!DB_NAME) {
-	throw new Error("Please define the DB_NAME environment variable inside .env");
-}
+let cached = global.mongoose;
 
-interface MongooseConnection {
-	conn: typeof mongoose | null;
-	promise: Promise<typeof mongoose> | null;
-}
-
-declare global {
-	var mongoose: MongooseConnection;
-}
-
-// Initialize the global mongoose object if it doesn't exist
-if (!global.mongoose) {
-	global.mongoose = { conn: null, promise: null };
+if (!cached) {
+	cached = global.mongoose = { conn: null, promise: null };
 }
 
 async function dbConnect() {
-	if (global.mongoose.conn) {
-		return global.mongoose.conn;
+	if (cached.conn) {
+		return cached.conn;
 	}
 
-	if (!global.mongoose.promise) {
+	if (!cached.promise) {
 		const opts = {
-			bufferCommands: true,
+			bufferCommands: false,
 		};
 
-		// Construct the connection string with the database name
-		const connectionString = `${MONGODB_URI}/${DB_NAME}`;
-
-		global.mongoose.promise = mongoose
-			.connect(connectionString, opts)
-			.then((mongoose) => {
-				console.log("✅ MongoDB Connected Successfully!");
-				return mongoose;
-			})
-			.catch((error) => {
-				console.error("❌ MongoDB Connection Error:", error);
-				throw error;
-			});
+		cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+			console.log("✅ MongoDB Connected Successfully!");
+			return mongoose;
+		});
 	}
 
 	try {
-		global.mongoose.conn = await global.mongoose.promise;
-		return global.mongoose.conn;
+		cached.conn = await cached.promise;
 	} catch (e) {
-		global.mongoose.promise = null;
+		cached.promise = null;
 		throw e;
 	}
+
+	return cached.conn;
 }
 
 export default dbConnect;

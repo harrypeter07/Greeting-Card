@@ -1,13 +1,9 @@
-"use client";
-
 import type React from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth-provider";
 import { Navbar } from "@/components/navbar/navbar";
 import { Hero } from "@/components/hero/hero";
-import { useEffect } from "react";
-import dbConnect from "@/lib/db-connect";
 import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,25 +13,14 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	useEffect(() => {
-		const initDb = async () => {
-			try {
-				await dbConnect();
-			} catch (error) {
-				console.error("Failed to connect to MongoDB:", error);
-			}
-		};
-		initDb();
-	}, []);
-
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={inter.className}>
+			<body className={`${inter.className} min-h-screen bg-background`}>
 				<AuthProvider>
 					<Navbar />
-					<main>
+					<main className="flex-1">
 						<Hero />
-						{children}
+						<div className="container mx-auto px-4 py-8">{children}</div>
 					</main>
 					<Toaster />
 				</AuthProvider>
@@ -43,5 +28,3 @@ export default function RootLayout({
 		</html>
 	);
 }
-
-import "./globals.css";

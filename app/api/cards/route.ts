@@ -1,15 +1,16 @@
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
+import { connectMongo } from "@/lib/db/connectMongo";
+import { Card } from "@/lib/db/models/Card.model";
 import { cardSchema } from "@/lib/schema";
 import { NextResponse } from "next/server";
 
 export async function GET() {
 	try {
-		const cards = await db.card.findMany({
-			orderBy: {
-				createdAt: "desc",
-			},
-		});
+		await connectMongo();
+
+		const cards = await Card.find()
+			.sort({ createdAt: -1 })
+			.populate("owner", "name email");
 
 		return NextResponse.json(cards);
 	} catch (error) {
@@ -25,14 +26,13 @@ export async function POST(req: Request) {
 			return new NextResponse("Unauthorized", { status: 401 });
 		}
 
+		await connectMongo();
 		const body = await req.json();
 		const validatedData = cardSchema.parse(body);
 
-		const card = await db.card.create({
-			data: {
-				...validatedData,
-				userId: session.user.id,
-			},
+		const card = await Card.create({
+			...validatedData,
+			owner: session.user.id,
 		});
 
 		return NextResponse.json(card);

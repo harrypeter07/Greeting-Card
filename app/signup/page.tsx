@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,42 +14,52 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 
-export default function SignInPage() {
+export default function SignUpPage() {
 	const router = useRouter();
-	const searchParams = useSearchParams();
 	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<string | null>(
-		searchParams.get("registered") === "true"
-			? "Account created successfully! Please sign in."
-			: null
-	);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setError(null);
-		setSuccess(null);
 		setIsLoading(true);
 
 		const formData = new FormData(e.currentTarget);
+		const name = formData.get("name") as string;
 		const email = formData.get("email") as string;
 		const password = formData.get("password") as string;
+		const confirmPassword = formData.get("confirmPassword") as string;
+
+		if (password !== confirmPassword) {
+			setError("Passwords do not match");
+			setIsLoading(false);
+			return;
+		}
 
 		try {
-			const result = await signIn("credentials", {
-				email,
-				password,
-				redirect: false,
+			const response = await fetch("/api/auth/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					name,
+					email,
+					password,
+				}),
 			});
 
-			if (result?.error) {
-				setError("Invalid email or password");
-			} else {
-				router.push("/gallery");
-				router.refresh();
+			if (!response.ok) {
+				const data = await response.json();
+				throw new Error(data.message || "Failed to create account");
 			}
+
+			// Redirect to sign in page after successful registration
+			router.push("/signin?registered=true");
 		} catch (error) {
-			setError("An error occurred. Please try again.");
+			setError(
+				error instanceof Error ? error.message : "Failed to create account"
+			);
 		} finally {
 			setIsLoading(false);
 		}
@@ -60,13 +69,23 @@ export default function SignInPage() {
 		<div className="container max-w-md mx-auto py-10">
 			<Card>
 				<CardHeader>
-					<CardTitle>Sign In</CardTitle>
+					<CardTitle>Create an Account</CardTitle>
 					<CardDescription>
-						Enter your email and password to sign in to your account
+						Enter your details to create your account
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<form onSubmit={handleSubmit} className="space-y-4">
+						<div className="space-y-2">
+							<Label htmlFor="name">Name</Label>
+							<Input
+								id="name"
+								name="name"
+								type="text"
+								placeholder="Enter your name"
+								required
+							/>
+						</div>
 						<div className="space-y-2">
 							<Label htmlFor="email">Email</Label>
 							<Input
@@ -83,19 +102,28 @@ export default function SignInPage() {
 								id="password"
 								name="password"
 								type="password"
-								placeholder="Enter your password"
+								placeholder="Create a password"
+								required
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="confirmPassword">Confirm Password</Label>
+							<Input
+								id="confirmPassword"
+								name="confirmPassword"
+								type="password"
+								placeholder="Confirm your password"
 								required
 							/>
 						</div>
 						{error && <div className="text-sm text-destructive">{error}</div>}
-						{success && <div className="text-sm text-green-600">{success}</div>}
 						<Button type="submit" className="w-full" disabled={isLoading}>
-							{isLoading ? "Signing in..." : "Sign In"}
+							{isLoading ? "Creating account..." : "Create Account"}
 						</Button>
 						<div className="text-center text-sm">
-							Don't have an account?{" "}
-							<Link href="/signup" className="text-primary hover:underline">
-								Sign up
+							Already have an account?{" "}
+							<Link href="/signin" className="text-primary hover:underline">
+								Sign in
 							</Link>
 						</div>
 					</form>

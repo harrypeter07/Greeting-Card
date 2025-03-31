@@ -27,6 +27,8 @@ export async function POST(req: Request) {
 				name,
 				email,
 				password: hashedPassword,
+				emailVerified: null,
+				image: null,
 			},
 		});
 

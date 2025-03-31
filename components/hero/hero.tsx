@@ -10,7 +10,7 @@ export function Hero() {
 	const { status, signIn } = useAuth();
 
 	return (
-		<div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+		<div className="relative py-20 flex items-center justify-center overflow-hidden">
 			{/* Background Pattern */}
 			<div className="absolute inset-0 bg-grid-pattern opacity-5" />
 

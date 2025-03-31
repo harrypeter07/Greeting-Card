@@ -5,6 +5,7 @@ import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { SessionProvider } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 	return (
@@ -29,18 +30,29 @@ export const AuthContext = createContext<{
 export function AuthConsumer({ children }: { children: React.ReactNode }) {
 	const { data: session, status } = useSession();
 	const [user, setUser] = useState<any | null>(null);
+	const router = useRouter();
 
 	useEffect(() => {
 		if (session?.user) {
-			setUser(session.user);
+			console.log("Full session:", session);
+			console.log("Session user:", session.user);
+			setUser({
+				...session.user,
+				id: session.user.id,
+			});
 		} else {
+			console.log("No session or user found");
 			setUser(null);
 		}
 	}, [session]);
 
 	const handleSignIn = async () => {
 		try {
-			await signIn("google", { callbackUrl: "/gallery" });
+			console.log("Initiating sign in...");
+			await signIn("google", {
+				callbackUrl: "/design",
+				redirect: true,
+			});
 		} catch (error) {
 			console.error("Sign in error:", error);
 		}
@@ -49,6 +61,7 @@ export function AuthConsumer({ children }: { children: React.ReactNode }) {
 	const handleSignOut = async () => {
 		try {
 			await signOut({ callbackUrl: "/" });
+			router.refresh();
 		} catch (error) {
 			console.error("Sign out error:", error);
 		}
