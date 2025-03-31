@@ -8,6 +8,7 @@ import { Navbar } from "@/components/navbar/navbar";
 import { Hero } from "@/components/hero/hero";
 import { useEffect } from "react";
 import dbConnect from "@/lib/db-connect";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +37,7 @@ export default function RootLayout({
 						<Hero />
 						{children}
 					</main>
+					<Toaster />
 				</AuthProvider>
 			</body>
 		</html>
