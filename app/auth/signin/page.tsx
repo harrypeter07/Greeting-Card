@@ -1,4 +1,15 @@
-import { SignInForm } from "@/components/auth/sign-in-form";
+"use client";
+
+import { signIn } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { useSearchParams } from "next/navigation";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,12 +18,27 @@ export const metadata: Metadata = {
 };
 
 export default function SignInPage() {
+	const searchParams = useSearchParams();
+	const callbackUrl = searchParams.get("callbackUrl") || "/design";
+
 	return (
-		<div className="container mx-auto py-8 flex justify-center">
-			<div className="max-w-md w-full">
-				<h1 className="text-3xl font-bold mb-6 text-center">Sign In</h1>
-				<SignInForm />
-			</div>
+		<div className="container flex items-center justify-center min-h-screen py-8">
+			<Card className="w-full max-w-md">
+				<CardHeader>
+					<CardTitle>Welcome to Eid Card Creator</CardTitle>
+					<CardDescription>
+						Sign in to create and save your cards
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<Button
+						className="w-full"
+						onClick={() => signIn("google", { callbackUrl })}
+					>
+						Sign in with Google
+					</Button>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }
