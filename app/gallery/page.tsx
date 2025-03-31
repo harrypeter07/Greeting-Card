@@ -6,7 +6,6 @@ import { Card } from "@/components/card";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { Metadata } from "next";
 
 interface CardData {
 	id: string;
@@ -19,12 +18,6 @@ interface CardData {
 	userId: string;
 	createdAt: string;
 }
-
-export const metadata: Metadata = {
-	title: "Gallery",
-	description:
-		"Browse beautiful AI-generated greeting cards created by our community",
-};
 
 export default function GalleryPage() {
 	const { user, status } = useAuth();
