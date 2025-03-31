@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
+const DB_NAME = process.env.DB_NAME;
 
 if (!MONGODB_URI) {
 	throw new Error(
 		"Please define the MONGODB_URI environment variable inside .env"
 	);
+}
+
+if (!DB_NAME) {
+	throw new Error("Please define the DB_NAME environment variable inside .env");
 }
 
 let cached = global.mongoose;
@@ -24,8 +29,10 @@ async function dbConnect() {
 			bufferCommands: true,
 		};
 
+		const connectionString = `${MONGODB_URI}${DB_NAME}`;
+
 		cached.promise = mongoose
-			.connect(MONGODB_URI!, opts)
+			.connect(connectionString, opts)
 			.then((mongoose) => {
 				console.log("✅ MongoDB Connected Successfully!");
 				return mongoose;
