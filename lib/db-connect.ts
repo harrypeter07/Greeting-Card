@@ -13,25 +13,34 @@ if (!DB_NAME) {
 	throw new Error("Please define the DB_NAME environment variable inside .env");
 }
 
-let cached = global.mongoose;
+interface MongooseConnection {
+	conn: typeof mongoose | null;
+	promise: Promise<typeof mongoose> | null;
+}
 
-if (!cached) {
-	cached = global.mongoose = { conn: null, promise: null };
+declare global {
+	var mongoose: MongooseConnection;
+}
+
+// Initialize the global mongoose object if it doesn't exist
+if (!global.mongoose) {
+	global.mongoose = { conn: null, promise: null };
 }
 
 async function dbConnect() {
-	if (cached.conn) {
-		return cached.conn;
+	if (global.mongoose.conn) {
+		return global.mongoose.conn;
 	}
 
-	if (!cached.promise) {
+	if (!global.mongoose.promise) {
 		const opts = {
 			bufferCommands: true,
 		};
 
-		const connectionString = `${MONGODB_URI}${DB_NAME}`;
+		// Construct the connection string with the database name
+		const connectionString = `${MONGODB_URI}/${DB_NAME}`;
 
-		cached.promise = mongoose
+		global.mongoose.promise = mongoose
 			.connect(connectionString, opts)
 			.then((mongoose) => {
 				console.log("✅ MongoDB Connected Successfully!");
@@ -44,10 +53,10 @@ async function dbConnect() {
 	}
 
 	try {
-		cached.conn = await cached.promise;
-		return cached.conn;
+		global.mongoose.conn = await global.mongoose.promise;
+		return global.mongoose.conn;
 	} catch (e) {
-		cached.promise = null;
+		global.mongoose.promise = null;
 		throw e;
 	}
 }
