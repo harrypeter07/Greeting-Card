@@ -4,12 +4,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth-provider";
 import { Navbar } from "@/components/navbar/navbar";
+import { Hero } from "./components/hero";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "Eid Greeting Cards",
-	description: "Create beautiful Eid greeting cards with AI assistance",
+	title: "AI Greeting Card Creator",
+	description: "Create beautiful greeting cards with AI",
 };
 
 export default function RootLayout({
@@ -22,7 +23,10 @@ export default function RootLayout({
 			<body className={inter.className}>
 				<AuthProvider>
 					<Navbar />
-					<main className="pt-16">{children}</main>
+					<main>
+						<Hero />
+						{children}
+					</main>
 				</AuthProvider>
 			</body>
 		</html>
