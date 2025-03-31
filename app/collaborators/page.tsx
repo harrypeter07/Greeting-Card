@@ -1,4 +1,12 @@
-"use client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+	title: "Our Team",
+	description:
+		"Meet the talented individuals behind the AI Greeting Card Creator",
+};
+
+("use client");
 
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
