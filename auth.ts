@@ -4,12 +4,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import { compare } from "bcryptjs";
 
-export const {
-	auth,
-	signIn,
-	signOut,
-	handlers: { GET, POST },
-} = NextAuth({
+const handler = NextAuth({
 	adapter: PrismaAdapter(db),
 	session: {
 		strategy: "jwt",
@@ -71,3 +66,5 @@ export const {
 		},
 	},
 });
+
+export const { auth, signIn, signOut } = handler;
